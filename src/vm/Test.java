@@ -52,7 +52,7 @@ public class Test {
 	static int[] factorial = {
 //.def fact: ARGS=1, LOCALS=0		ADDRESS
 //	IF N < 2 RETURN 1
-			LOAD, -3,				// 0
+			LOAD, -4,				// 0
 			ICONST, 2,				// 2
 			ILT,					// 4
 			BRF, 10,				// 5
@@ -60,8 +60,8 @@ public class Test {
 			RET,					// 9
 //CONT:
 //	RETURN N * FACT(N-1)
-			LOAD, -3,				// 10
-			LOAD, -3,				// 12
+			LOAD, -4,				// 10
+			LOAD, -4,				// 12
 			ICONST, 1,				// 14
 			ISUB,					// 16
 			CALL, 0, 1,				// 17
@@ -74,9 +74,37 @@ public class Test {
 			PRINT,					// 27
 			HALT					// 28
 	};
+	
+	static int[] tailRecursiveFactorial = {
+		//.DEF FACT(X, R)
+		// IF X < 2 RETURN R
+					LOAD, -5,				// 0
+					ICONST, 2,				// 2
+					ILT,					// 4
+					BRF, 10,				// 5
+					LOAD, -4,				// 7
+					RET,					// 9
+		//CONT:
+		// RETURN FACT(X-1, X*R)
+					LOAD, -5,				// 10
+					ICONST, 1,				// 12
+					ISUB,					// 14
+					LOAD, -5,				// 15
+					LOAD, -4,				// 17
+					IMUL,					// 19
+					CALL, 0, 2,				// 20
+					RET,					// 23
+		//.DEF MAIN: ARGS=0, LOCALS=0
+		// PRINT FACT(10, 1)
+					ICONST, 5,             // 24	<-- MAIN METHOD!
+					ICONST, 1,				// 26
+					CALL, 0, 2,				// 28
+					PRINT,					// 31
+					HALT					// 32
+			};
 
 	public static void main(String[] args) {
-		VM vm = new VM(factorial, 22, 0);
+		VM vm = new VM(loop, 0, 0);
 		vm.trace = true;
 		vm.exec();
 	}

@@ -51,6 +51,8 @@ public class VM {
 
 	public void exec() {
 		ip = startip;
+		fp++;
+		stack[++sp]  = ip;
 		cpu();
 	}
 
@@ -127,15 +129,27 @@ public class VM {
 					// expects all args on stack
 					addr = code[ip++];			// target addr of function
 					int nargs = code[ip++];		// how many args got pushed
+					if (addr == stack[fp] && code[ip] == RET) {
+						for (int i = 0; i < nargs; i++)
+						{
+							stack[fp - 4 - i] = stack[sp--];
+						}
+						sp = fp;
+						ip = addr;
+						break;
+					}
 					stack[++sp] = nargs;	 	// save num args
 					stack[++sp] = fp;		 	// save fp
 					stack[++sp] = ip;		 	// push return address
+					stack[++sp] = addr;
 					fp = sp;					// fp points at ret addr on stack
 					ip = addr;					// jump to function
 					// code preamble of func must push space for locals
 					break;
 				case RET:
 					int rvalue = stack[sp--];	// pop return value
+					sp--;
+					fp--;
 					sp = fp;					// jump over locals to fp which points at ret addr
 					ip = stack[sp--];			// pop return address, jump to it
 					fp = stack[sp--];			// restore fp
